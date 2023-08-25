@@ -70,12 +70,9 @@ function handleNumberButtonClick(last, key, dataThemeEqualCheck) {
 function handleDotButtonClick(last, key) {
   EqualCheck();
   if (["*", "%", "/", "+", "-"].includes(last)) {
-    buffer.pop();
-  }
-
-  if (last && last.includes(key)) {
-    return;
-  } else {
+    buffer[buffer.length] = "0.";
+    display();
+  } else if (!last.includes(key)) {
     const num = buffer.pop();
     buffer.push(num + key);
     display();
@@ -128,9 +125,12 @@ function handleOperatorButtonClick(buffer, last) {
   if (buffer[0] !== "0") {
     if (["*", "%", "/", "+", "-"].includes(last)) {
       buffer.pop();
-    } else if (last.charAt(last.length - 1) === ".") {
+    } else if (last === "0.1") {
       buffer.pop();
-      buffer.push(last.slice(0, -1));
+      buffer.pop();
+      display();
+    } else if (last.endsWith(".")) {
+      buffer[buffer.length - 1] = last.slice(0, -1);
     }
 
     buffer.push(key);
