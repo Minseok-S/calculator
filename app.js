@@ -3,6 +3,8 @@ let buffer = ["0"];
 document.body.addEventListener("click", (e) => {
   let target = e.target;
   let last = buffer[buffer.length - 1];
+  const equalCheck = document.getElementById("btns-equal");
+  const dataTheme_equalcheck = equalCheck.dataset.theme;
 
   if (e.target.id) {
     key = document.querySelector(`#${e.target.id}`).textContent;
@@ -18,9 +20,10 @@ document.body.addEventListener("click", (e) => {
     case "btns-2":
     case "btns-1":
     case "btns-0":
-      if (buffer[0] == "0" || typeof last == "number") {
+      if (buffer[0] == "0" || dataTheme_equalcheck == "1") {
         buffer.pop();
         buffer.push(key);
+        equalCheck.setAttribute("data-theme", "0");
       } else if (isNaN(last) == false) {
         num = buffer.pop();
         console.log(num);
@@ -52,6 +55,7 @@ document.body.addEventListener("click", (e) => {
       } else {
         num = buffer.pop();
         buffer.push(num + key);
+        display();
 
         break;
       }
@@ -59,17 +63,17 @@ document.body.addEventListener("click", (e) => {
     case "btns-sign":
       blink();
 
-      const btnsSign = document.getElementById("btns-sign");
-      const dataTheme = btnsSign.dataset.theme;
+      const signCheck = document.getElementById("btns-sign");
+      const dataTheme_sign = signCheck.dataset.theme;
 
       if (buffer[0] != "0") {
-        if (dataTheme == "plus") {
-          btnsSign.setAttribute("data-theme", "minus");
+        if (dataTheme_sign == "plus") {
+          signCheck.setAttribute("data-theme", "minus");
           buffer[buffer.length - 1] = "-" + last;
           display();
           break;
         } else {
-          btnsSign.setAttribute("data-theme", "plus");
+          signCheck.setAttribute("data-theme", "plus");
           buffer[buffer.length - 1] = last.slice(1);
           display();
           break;
@@ -88,7 +92,9 @@ document.body.addEventListener("click", (e) => {
       try {
         let combine = buffer.join("");
         result = eval(combine);
+        result = result.toString();
         buffer = [result];
+        equalCheck.setAttribute("data-theme", "1");
         display();
       } catch (error) {
         error;
