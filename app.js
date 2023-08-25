@@ -47,7 +47,7 @@ function handleButtonClick(e) {
     case "btns-minus":
     case "btns-percent":
     case "btns-multiply":
-      handleOperatorButtonClick(buffer, last, dataThemeEqualCheck);
+      handleOperatorButtonClick(buffer, last);
       break;
   }
 }
@@ -68,6 +68,7 @@ function handleNumberButtonClick(last, key, dataThemeEqualCheck) {
 }
 
 function handleDotButtonClick(last, key) {
+  EqualCheck();
   if (["*", "%", "/", "+", "-"].includes(last)) {
     buffer.pop();
   }
@@ -82,6 +83,7 @@ function handleDotButtonClick(last, key) {
 }
 
 function handleSignButtonClick(last) {
+  EqualCheck();
   blink();
   const signCheck = document.getElementById("btns-sign");
   const dataThemeSign = signCheck.dataset.theme;
@@ -100,6 +102,7 @@ function handleSignButtonClick(last) {
 }
 
 function handleDeleteButtonClick() {
+  EqualCheck();
   blink();
   buffer = ["0"];
   display();
@@ -119,10 +122,10 @@ function handleEqualButtonClick() {
   }
 }
 
-function handleOperatorButtonClick(buffer, last, dataThemeEqualCheck) {
+function handleOperatorButtonClick(buffer, last) {
+  EqualCheck();
   blink();
-  if (buffer[0] !== "0" || dataThemeEqualCheck === "1") {
-    document.getElementById("btns-equal").setAttribute("data-theme", "0");
+  if (buffer[0] !== "0") {
     if (["*", "%", "/", "+", "-"].includes(last)) {
       buffer.pop();
     } else if (last.charAt(last.length - 1) === ".") {
@@ -145,4 +148,8 @@ function blink() {
 function display() {
   const displayElement = document.querySelector(".display");
   displayElement.textContent = buffer[buffer.length - 1];
+}
+
+function EqualCheck() {
+  document.getElementById("btns-equal").setAttribute("data-theme", "0");
 }
