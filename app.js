@@ -1,14 +1,17 @@
 let buffer = ["0"];
 
-document.body.addEventListener("click", (e) => {
-  let target = e.target;
-  let last = buffer[buffer.length - 1];
-  const equalCheck = document.getElementById("btns-equal");
-  const dataTheme_equalcheck = equalCheck.dataset.theme;
+document.body.addEventListener("click", handleButtonClick);
 
-  if (e.target.id) {
+function handleButtonClick(e) {
+  const target = e.target;
+  const last = buffer[buffer.length - 1];
+  const equalCheck = document.getElementById("btns-equal");
+  const dataThemeEqualCheck = equalCheck.dataset.theme;
+
+  if (target.id) {
     key = document.querySelector(`#${e.target.id}`).textContent;
   }
+
   switch (target.id) {
     case "btns-9":
     case "btns-8":
@@ -20,85 +23,23 @@ document.body.addEventListener("click", (e) => {
     case "btns-2":
     case "btns-1":
     case "btns-0":
-      if (buffer[0] == "0" || dataTheme_equalcheck == "1") {
-        buffer.pop();
-        buffer.push(key);
-        equalCheck.setAttribute("data-theme", "0");
-      } else if (isNaN(last) == false) {
-        num = buffer.pop();
-        console.log(num);
-        if (num === "") {
-          buffer.push(key);
-        } else {
-          buffer.push(num + key);
-        }
-      } else {
-        buffer.push(key);
-      }
-      display();
-
+      handleNumberButtonClick(last, key, dataThemeEqualCheck);
       break;
 
     case "btns-dot":
-      if (
-        last === "*" ||
-        last === "%" ||
-        last === "/" ||
-        last === "+" ||
-        last === "-"
-      ) {
-        buffer.pop();
-      }
-
-      if (last && last.indexOf(key) !== -1) {
-        break;
-      } else {
-        num = buffer.pop();
-        buffer.push(num + key);
-        display();
-
-        break;
-      }
+      handleDotButtonClick(last, key);
+      break;
 
     case "btns-sign":
-      blink();
-
-      const signCheck = document.getElementById("btns-sign");
-      const dataTheme_sign = signCheck.dataset.theme;
-
-      if (buffer[0] != "0") {
-        if (dataTheme_sign == "plus") {
-          signCheck.setAttribute("data-theme", "minus");
-          buffer[buffer.length - 1] = "-" + last;
-          display();
-          break;
-        } else {
-          signCheck.setAttribute("data-theme", "plus");
-          buffer[buffer.length - 1] = last.slice(1);
-          display();
-          break;
-        }
-      }
+      handleSignButtonClick(last);
+      break;
 
     case "btns-del":
-      blink();
-      buffer = ["0"];
-      display();
+      handleDeleteButtonClick();
       break;
 
     case "btns-equal":
-      blink();
-
-      try {
-        let combine = buffer.join("");
-        result = eval(combine);
-        result = result.toString();
-        buffer = [result];
-        equalCheck.setAttribute("data-theme", "1");
-        display();
-      } catch (error) {
-        error;
-      }
+      handleEqualButtonClick();
       break;
 
     case "btns-divide":
@@ -106,21 +47,83 @@ document.body.addEventListener("click", (e) => {
     case "btns-minus":
     case "btns-percent":
     case "btns-multiply":
-      calculateExpression(buffer, last);
+      handleOperatorButtonClick(buffer, last, dataThemeEqualCheck);
       break;
   }
-});
+}
 
-function calculateExpression(buffer, last) {
+function handleNumberButtonClick(last, key, dataThemeEqualCheck) {
+  if (buffer[0] === "0" || dataThemeEqualCheck === "1") {
+    buffer.pop();
+    buffer.push(key);
+    document.getElementById("btns-equal").setAttribute("data-theme", "0");
+  } else if (!isNaN(last)) {
+    const num = buffer.pop();
+    buffer.push(num === "" ? key : num + key);
+  } else {
+    buffer.push(key);
+  }
+
+  display();
+}
+
+function handleDotButtonClick(last, key) {
+  if (["*", "%", "/", "+", "-"].includes(last)) {
+    buffer.pop();
+  }
+
+  if (last && last.includes(key)) {
+    return;
+  } else {
+    const num = buffer.pop();
+    buffer.push(num + key);
+    display();
+  }
+}
+
+function handleSignButtonClick(last) {
   blink();
-  if (buffer[0] != "0") {
-    if (
-      last === "*" ||
-      last === "%" ||
-      last === "/" ||
-      last === "+" ||
-      last === "-"
-    ) {
+  const signCheck = document.getElementById("btns-sign");
+  const dataThemeSign = signCheck.dataset.theme;
+
+  if (buffer[0] !== "0") {
+    if (dataThemeSign === "plus") {
+      signCheck.setAttribute("data-theme", "minus");
+      buffer[buffer.length - 1] = "-" + last;
+    } else {
+      signCheck.setAttribute("data-theme", "plus");
+      buffer[buffer.length - 1] = last.slice(1);
+    }
+
+    display();
+  }
+}
+
+function handleDeleteButtonClick() {
+  blink();
+  buffer = ["0"];
+  display();
+}
+
+function handleEqualButtonClick() {
+  blink();
+
+  try {
+    const combined = buffer.join("");
+    const result = eval(combined).toString();
+    buffer = [result];
+    document.getElementById("btns-equal").setAttribute("data-theme", "1");
+    display();
+  } catch (error) {
+    // Handle the error
+  }
+}
+
+function handleOperatorButtonClick(buffer, last, dataThemeEqualCheck) {
+  blink();
+  if (buffer[0] !== "0" || dataThemeEqualCheck === "1") {
+    document.getElementById("btns-equal").setAttribute("data-theme", "0");
+    if (["*", "%", "/", "+", "-"].includes(last)) {
       buffer.pop();
     } else if (last.charAt(last.length - 1) === ".") {
       buffer.pop();
@@ -133,7 +136,6 @@ function calculateExpression(buffer, last) {
 
 function blink() {
   const displayElement = document.querySelector(".display");
-
   displayElement.style.color = "var(--t1-screen-background)";
   setTimeout(() => {
     displayElement.style.color = "var(--t1-text-display)";
@@ -141,8 +143,6 @@ function blink() {
 }
 
 function display() {
-  let displayElement = document.querySelector(".display");
-
-  console.log(buffer);
+  const displayElement = document.querySelector(".display");
   displayElement.textContent = buffer[buffer.length - 1];
 }
