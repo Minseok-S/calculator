@@ -65,12 +65,12 @@ document.body.addEventListener("click", (e) => {
       if (buffer[0] != "0") {
         if (dataTheme == "plus") {
           btnsSign.setAttribute("data-theme", "minus");
-          buffer.unshift("-");
+          buffer[buffer.length - 1] = "-" + last;
           display();
           break;
         } else {
           btnsSign.setAttribute("data-theme", "plus");
-          buffer.shift();
+          buffer[buffer.length - 1] = last.slice(1);
           display();
           break;
         }
